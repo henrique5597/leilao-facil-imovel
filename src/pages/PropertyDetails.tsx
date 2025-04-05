@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, CalendarClock, ChevronLeft, ChevronRight, ExternalLink, Home, MapPin, Square } from "lucide-react";
+import { ArrowLeft, CalendarClock, ChevronLeft, ChevronRight, ExternalLink, Heart, Home, MapPin, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -12,6 +12,8 @@ import {
   getSaleListingsByNeighborhood, 
   getRentListingsByNeighborhood 
 } from "@/data/mockData";
+import CountdownTimer from "@/components/CountdownTimer";
+import { Card } from "@/components/ui/card";
 
 const PropertyDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -90,102 +92,112 @@ const PropertyDetails = () => {
           <ArrowLeft size={16} className="mr-1" />
           Voltar
         </Button>
-        
-        <h1 className="text-2xl md:text-3xl font-bold mb-3">{property.title}</h1>
-        
-        <div className="flex items-center text-gray-600 mb-4">
-          <MapPin size={18} className="mr-1" />
-          <span>{property.address}, {property.neighborhood}, {property.city}</span>
-        </div>
+      </div>
+      
+      {/* Contagem regressiva */}
+      <div className="mb-6">
+        <CountdownTimer />
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Coluna principal */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Imagem principal */}
-          <div className="rounded-lg overflow-hidden shadow-md relative">
-            <img 
-              src={propertyImages[currentImageIndex]} 
-              alt={property.title}
-              className="w-full h-auto object-cover"
-            />
-            
-            {propertyImages.length > 1 && (
-              <>
+          {/* Card de informações do imóvel no estilo da referência */}
+          <Card className="bg-white overflow-hidden">
+            <div className="flex flex-col md:flex-row">
+              {/* Imagem do imóvel */}
+              <div className="w-full md:w-1/3 relative">
+                <img 
+                  src={propertyImages[currentImageIndex]} 
+                  alt={property.title}
+                  className="w-full h-full object-cover min-h-[200px]"
+                />
+                
+                {propertyImages.length > 1 && (
+                  <>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 text-white hover:bg-black/60"
+                      onClick={prevPropertyImage}
+                    >
+                      <ChevronLeft size={18} />
+                    </Button>
+                    
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 text-white hover:bg-black/60"
+                      onClick={nextPropertyImage}
+                    >
+                      <ChevronRight size={18} />
+                    </Button>
+                  </>
+                )}
+                
+                {/* Botão de favorito */}
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 text-white hover:bg-black/60"
-                  onClick={prevPropertyImage}
+                  className="absolute right-2 top-2 w-8 h-8 rounded-full bg-white/80 text-gray-700 hover:bg-white"
                 >
-                  <ChevronLeft size={20} />
+                  <Heart size={18} />
                 </Button>
+              </div>
+              
+              {/* Detalhes do imóvel */}
+              <div className="w-full md:w-2/3 p-4">
+                <h2 className="text-xl font-bold text-blue-600 mb-2">{property.title}</h2>
                 
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 text-white hover:bg-black/60"
-                  onClick={nextPropertyImage}
-                >
-                  <ChevronRight size={20} />
-                </Button>
-                
-                {/* Indicador de imagens */}
-                <div className="absolute bottom-2 left-0 right-0 flex justify-center">
-                  <div className="bg-black/60 rounded-full px-3 py-1 text-sm text-white">
-                    {currentImageIndex + 1}/{propertyImages.length}
+                <div className="space-y-2">
+                  <div>
+                    <div className="text-gray-800">Valor de avaliação: <span className="font-semibold">{formattedOriginalPrice}</span></div>
+                    <div className="text-gray-800">Valor mínimo de venda: <span className="font-semibold text-red-600">{formattedPrice}</span> 
+                      {property.discount && (
+                        <span className="ml-2 text-sm text-blue-600">
+                          (desconto de {property.discount}%)
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="py-1 border-t border-b border-gray-200">
+                    <div className="flex items-center text-gray-700">
+                      {property.bedrooms && (
+                        <span className="mr-4">Apartamento - {property.bedrooms} quarto(s)</span>
+                      )}
+                      {property.area && (
+                        <span><Square size={14} className="inline mr-1" /> {property.area}m²</span>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <div className="text-gray-700">Número do imóvel: {id}</div>
+                    <div className="text-gray-700 uppercase">{property.address}, {property.neighborhood}, {property.city}</div>
+                    <div className="text-gray-600 text-sm mt-1">
+                      Despesas do imóvel, se houver: Condomínio (até 10% do valor de avaliação) e tributos sob responsabilidade do comprador.
+                    </div>
+                  </div>
+                  
+                  <div className="flex space-x-2 pt-2">
+                    <Link 
+                      to={`/imovel/${property.id}/detalhes`}
+                      className="text-orange-500 text-sm font-semibold hover:underline flex items-center"
+                    >
+                      <span className="mr-1">•</span> Detalhes do imóvel
+                    </Link>
+                    <Link 
+                      to="#"
+                      className="text-blue-500 text-sm font-semibold hover:underline flex items-center"
+                    >
+                      <span className="mr-1">•</span> Corretores credenciados
+                    </Link>
                   </div>
                 </div>
-              </>
-            )}
-          </div>
-          
-          {/* Detalhes do imóvel */}
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-bold mb-4">Detalhes do Imóvel</h2>
-            
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-              {property.bedrooms && (
-                <div className="flex flex-col items-center p-3 bg-leilao-light rounded-md">
-                  <Home size={22} className="text-leilao-primary mb-1" />
-                  <span className="text-sm text-gray-600">Quartos</span>
-                  <span className="font-bold">{property.bedrooms}</span>
-                </div>
-              )}
-              
-              {property.area && (
-                <div className="flex flex-col items-center p-3 bg-leilao-light rounded-md">
-                  <Square size={22} className="text-leilao-primary mb-1" />
-                  <span className="text-sm text-gray-600">Área</span>
-                  <span className="font-bold">{property.area} m²</span>
-                </div>
-              )}
-              
-              <div className="flex flex-col items-center p-3 bg-leilao-light rounded-md">
-                <MapPin size={22} className="text-leilao-primary mb-1" />
-                <span className="text-sm text-gray-600">Bairro</span>
-                <span className="font-bold">{property.neighborhood}</span>
-              </div>
-              
-              <div className="flex flex-col items-center p-3 bg-leilao-light rounded-md">
-                <CalendarClock size={22} className="text-leilao-primary mb-1" />
-                <span className="text-sm text-gray-600">Data do Leilão</span>
-                <span className="font-bold">{property.auctionDate}</span>
               </div>
             </div>
-            
-            <p className="text-gray-600 mb-4">
-              Este imóvel está disponível para leilão pela Caixa Econômica Federal. 
-              A data do leilão está marcada para {property.auctionDate}.
-            </p>
-            
-            <Button asChild className="w-full">
-              <a href="#" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center">
-                Ver Anúncio da Caixa
-                <ExternalLink size={16} className="ml-2" />
-              </a>
-            </Button>
-          </div>
+          </Card>
           
           {/* Mapa */}
           <div className="bg-white p-6 rounded-lg shadow-md">
@@ -248,62 +260,69 @@ const PropertyDetails = () => {
         
         {/* Coluna lateral */}
         <div className="space-y-6">
-          {/* Card de preço - Atualizado para mostrar Valor de avaliação e Valor mínimo de venda */}
-          <div className="bg-white p-6 rounded-lg shadow-md sticky top-6">
-            <div className="text-center mb-4">
-              <h2 className="text-2xl font-bold text-leilao-primary">{formattedPrice}</h2>
-              <p className="text-gray-600 text-sm mt-1">Valor mínimo de venda</p>
+          <div className="p-5 bg-blue-50 rounded-lg">
+            <h3 className="text-xl font-bold text-blue-700 mb-4">Compra Direta</h3>
+            
+            <div className="bg-white p-4 rounded shadow-sm">
+              <div className="text-center mb-4">
+                <p className="text-lg font-bold text-blue-800">{property.title}</p>
+              </div>
               
-              {property.originalPrice && (
-                <div className="mt-3">
-                  <span className="text-gray-700 text-lg font-semibold block">
-                    {formattedOriginalPrice}
-                  </span>
-                  <p className="text-gray-600 text-sm">Valor de avaliação</p>
-                  
+              <div className="space-y-3">
+                <div>
+                  <p className="text-gray-600">Valor de avaliação:</p>
+                  <p className="text-lg font-semibold">{formattedOriginalPrice}</p>
+                </div>
+                
+                <div>
+                  <p className="text-gray-600">Valor mínimo de venda:</p>
+                  <p className="text-lg font-semibold text-red-600">{formattedPrice}</p>
                   {property.discount && (
-                    <Badge className="bg-leilao-secondary text-white mt-2">
-                      {property.discount}% de desconto
+                    <Badge className="bg-blue-100 text-blue-800 font-normal">
+                      Desconto de {property.discount}%
                     </Badge>
                   )}
                 </div>
-              )}
-            </div>
-            
-            <div className="bg-leilao-light p-4 rounded-md mb-6">
-              <div className="flex justify-between mb-2">
-                <span className="text-gray-600">Data do Leilão:</span>
-                <span className="font-semibold">{property.auctionDate}</span>
+                
+                <div className="border-t border-gray-200 pt-3">
+                  <p className="text-gray-700 flex items-center">
+                    <CalendarClock size={16} className="mr-2" />
+                    Data do Leilão: {property.auctionDate}
+                  </p>
+                </div>
+                
+                <div className="pt-3">
+                  <Button asChild className="w-full bg-blue-600 hover:bg-blue-700">
+                    <a href="#" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center">
+                      Ver Anúncio Oficial
+                      <ExternalLink size={16} className="ml-2" />
+                    </a>
+                  </Button>
+                </div>
               </div>
-              
-              <div className="flex justify-between">
-                <span className="text-gray-600">Cidade:</span>
-                <span className="font-semibold">{property.city}</span>
-              </div>
             </div>
+          </div>
+          
+          {/* Informações extras */}
+          <div className="bg-white p-5 rounded-lg shadow-md">
+            <h3 className="text-lg font-semibold mb-3">Informações importantes</h3>
             
-            <Button asChild className="w-full mb-3">
-              <a href="#" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center">
-                Ver Anúncio da Caixa
-                <ExternalLink size={16} className="ml-2" />
-              </a>
-            </Button>
-            
-            <Button variant="outline" asChild className="w-full">
-              <Link to={`/cidade/${property.city.toLowerCase()}`}>
-                Ver outros imóveis em {property.city}
-              </Link>
-            </Button>
-            
-            <div className="mt-6 pt-6 border-t border-gray-200">
-              <p className="text-sm text-gray-500 mb-4">
-                Este é um imóvel disponível para leilão pela Caixa Econômica Federal. 
-                Para participar do leilão, você precisa seguir os procedimentos oficiais da Caixa.
+            <div className="space-y-4 text-sm text-gray-600">
+              <p>
+                Este é um imóvel disponível para leilão oficial. 
+                Para participar do leilão, você precisa seguir os procedimentos oficiais.
               </p>
               
-              <p className="text-sm text-gray-500">
+              <p>
                 Recomendamos verificar o edital do leilão e as condições do imóvel antes de fazer um lance.
+                As despesas são de responsabilidade do comprador.
               </p>
+              
+              <Button variant="outline" asChild className="w-full mt-2">
+                <Link to={`/cidade/${property.city.toLowerCase()}`}>
+                  Ver outros imóveis em {property.city}
+                </Link>
+              </Button>
             </div>
           </div>
         </div>

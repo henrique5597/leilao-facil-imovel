@@ -1,5 +1,5 @@
 
-import { CalendarClock, Home, MapPin } from "lucide-react";
+import { CalendarClock, Heart, Home, MapPin, Square } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -28,74 +28,76 @@ const formatCurrency = (value: number) => {
 
 const PropertyCard = ({ property }: { property: PropertyProps }) => {
   const formattedPrice = formatCurrency(property.price);
-  const discountText = property.discount ? `${property.discount}% de desconto` : null;
+  const formattedOriginalPrice = property.originalPrice 
+    ? formatCurrency(property.originalPrice) 
+    : null;
   
   return (
     <Card className="h-full overflow-hidden transition-all hover:shadow-lg">
-      <div className="relative h-48 overflow-hidden">
-        <img 
-          src={property.imageUrl} 
-          alt={property.title}
-          className="w-full h-full object-cover transition-transform hover:scale-105"
-        />
-        {discountText && (
-          <Badge className="absolute top-2 right-2 bg-leilao-secondary text-white">
-            {discountText}
-          </Badge>
-        )}
+      <div className="p-3 bg-blue-50">
+        <h3 className="text-lg font-semibold text-blue-700">Compra Direta</h3>
       </div>
       
-      <CardContent className="p-4">
-        <h3 className="text-lg font-semibold mb-2 line-clamp-2">{property.title}</h3>
-        
-        <div className="flex items-center text-gray-500 mb-2">
-          <MapPin size={16} className="mr-1" />
-          <span className="text-sm truncate">{property.neighborhood}, {property.city}</span>
+      <div className="flex flex-col sm:flex-row">
+        <div className="relative h-48 sm:w-1/3 overflow-hidden">
+          <img 
+            src={property.imageUrl} 
+            alt={property.title}
+            className="w-full h-full object-cover transition-transform hover:scale-105"
+          />
+          {/* Botão de favorito */}
+          <button className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center rounded-full bg-white/80 text-gray-700 hover:bg-white">
+            <Heart size={18} />
+          </button>
         </div>
         
-        <div className="flex items-center text-gray-500 mb-3">
-          <CalendarClock size={16} className="mr-1" />
-          <span className="text-sm">Leilão: {property.auctionDate}</span>
-        </div>
-        
-        {(property.bedrooms || property.area) && (
-          <div className="flex gap-3 mb-3">
-            {property.bedrooms && (
-              <div className="flex items-center text-sm">
-                <Home size={16} className="mr-1" />
-                <span>{property.bedrooms} {property.bedrooms > 1 ? 'quartos' : 'quarto'}</span>
+        <CardContent className="p-4 sm:w-2/3">
+          <h3 className="text-lg font-semibold text-blue-600 mb-2">{property.title}</h3>
+          
+          <div className="space-y-2">
+            {formattedOriginalPrice && (
+              <div className="text-gray-700">
+                Valor de avaliação: <span className="font-medium">{formattedOriginalPrice}</span>
               </div>
             )}
             
-            {property.area && (
-              <div className="flex items-center text-sm">
-                <span>{property.area}m²</span>
-              </div>
-            )}
-          </div>
-        )}
-        
-        <div className="mt-2">
-          <div className="text-lg font-bold text-leilao-primary">
-            {formattedPrice}
-          </div>
-          <div className="text-sm text-gray-500">
-            Valor mínimo de venda
-          </div>
-          
-          {property.originalPrice && (
-            <div className="text-sm text-gray-700 mt-1">
-              <span>{formatCurrency(property.originalPrice)}</span>
-              <span className="text-xs block text-gray-500">Valor de avaliação</span>
+            <div className="text-gray-700">
+              Valor mínimo de venda: <span className="font-semibold text-red-600">{formattedPrice}</span>
+              {property.discount && (
+                <span className="ml-2 text-sm text-blue-600">
+                  (desconto de {property.discount}%)
+                </span>
+              )}
             </div>
-          )}
-        </div>
-      </CardContent>
+            
+            <div className="py-1 border-t border-b border-gray-200">
+              <div className="flex items-center text-gray-700 text-sm">
+                {property.bedrooms && (
+                  <span className="mr-4">Apartamento - {property.bedrooms} quarto(s)</span>
+                )}
+                {property.area && (
+                  <span><Square size={14} className="inline mr-1" /> {property.area}m²</span>
+                )}
+              </div>
+            </div>
+            
+            <div className="flex items-center text-gray-600 text-sm">
+              <MapPin size={16} className="mr-1 flex-shrink-0" />
+              <span className="truncate">{property.neighborhood}, {property.city}</span>
+            </div>
+            
+            <div className="flex items-center text-gray-600 text-sm">
+              <CalendarClock size={16} className="mr-1 flex-shrink-0" />
+              <span>Leilão: {property.auctionDate}</span>
+            </div>
+          </div>
+        </CardContent>
+      </div>
       
       <CardFooter className="bg-gray-50 p-4">
         <Link 
           to={`/imovel/${property.id}`} 
-          className="w-full text-center py-2 px-4 bg-leilao-primary text-white rounded-md hover:bg-leilao-dark transition-colors"
+          className="w-full text-center py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
         >
           Ver detalhes
         </Link>
