@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,6 +62,14 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// Cores personalizadas para o Leilão Fácil Imóvel
+				leilao: {
+					primary: '#00529C',
+					secondary: '#FF7A00',
+					light: '#E6F2FF',
+					dark: '#003366',
+					bg: '#F8FAFC',
 				}
 			},
 			borderRadius: {
