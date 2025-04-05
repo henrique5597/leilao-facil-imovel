@@ -1,7 +1,7 @@
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, CalendarClock, ExternalLink, Home, MapPin, Square } from "lucide-react";
+import { ArrowLeft, CalendarClock, ChevronLeft, ChevronRight, ExternalLink, Home, MapPin, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -23,6 +23,26 @@ const PropertyDetails = () => {
   // Preços de mercado para venda e aluguel baseados no bairro
   const saleListings = property ? getSaleListingsByNeighborhood(property.neighborhood) : [];
   const rentListings = property ? getRentListingsByNeighborhood(property.neighborhood) : [];
+  
+  // Estado para controlar a visualização de imagem atual do imóvel
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  // Tratamos property.imageUrl como um array para futura expansão
+  const propertyImages = property ? [property.imageUrl] : [];
+  
+  // Funções para navegação de imagens do imóvel principal
+  const nextPropertyImage = () => {
+    if (propertyImages.length > 1) {
+      setCurrentImageIndex((prev) => (prev + 1) % propertyImages.length);
+    }
+  };
+  
+  const prevPropertyImage = () => {
+    if (propertyImages.length > 1) {
+      setCurrentImageIndex((prev) => 
+        prev === 0 ? propertyImages.length - 1 : prev - 1
+      );
+    }
+  };
   
   // Redireciona para NotFound se o imóvel não existir
   useEffect(() => {
@@ -83,12 +103,41 @@ const PropertyDetails = () => {
         {/* Coluna principal */}
         <div className="lg:col-span-2 space-y-6">
           {/* Imagem principal */}
-          <div className="rounded-lg overflow-hidden shadow-md">
+          <div className="rounded-lg overflow-hidden shadow-md relative">
             <img 
-              src={property.imageUrl} 
+              src={propertyImages[currentImageIndex]} 
               alt={property.title}
               className="w-full h-auto object-cover"
             />
+            
+            {propertyImages.length > 1 && (
+              <>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 text-white hover:bg-black/60"
+                  onClick={prevPropertyImage}
+                >
+                  <ChevronLeft size={20} />
+                </Button>
+                
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 text-white hover:bg-black/60"
+                  onClick={nextPropertyImage}
+                >
+                  <ChevronRight size={20} />
+                </Button>
+                
+                {/* Indicador de imagens */}
+                <div className="absolute bottom-2 left-0 right-0 flex justify-center">
+                  <div className="bg-black/60 rounded-full px-3 py-1 text-sm text-white">
+                    {currentImageIndex + 1}/{propertyImages.length}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
           
           {/* Detalhes do imóvel */}
@@ -166,7 +215,11 @@ const PropertyDetails = () => {
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {saleListings.map(listing => (
-                      <MarketPriceCard key={listing.id} listing={listing} />
+                      <MarketPriceCard key={listing.id} listing={{
+                        ...listing,
+                        // Compatibilidade com dados antigos
+                        imageUrls: Array.isArray(listing.imageUrls) ? listing.imageUrls : [(listing as any).imageUrl || ""]
+                      }} />
                     ))}
                   </div>
                 </div>
@@ -180,7 +233,11 @@ const PropertyDetails = () => {
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {rentListings.map(listing => (
-                      <MarketPriceCard key={listing.id} listing={listing} />
+                      <MarketPriceCard key={listing.id} listing={{
+                        ...listing,
+                        // Compatibilidade com dados antigos
+                        imageUrls: Array.isArray(listing.imageUrls) ? listing.imageUrls : [(listing as any).imageUrl || ""]
+                      }} />
                     ))}
                   </div>
                 </div>

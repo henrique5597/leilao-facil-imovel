@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -21,7 +21,7 @@ const AdminMarketPriceForm = () => {
     title: "",
     price: "",
     description: "",
-    imageUrl: "",
+    imageUrls: [""], // Agora é um array de URLs
     externalLink: "",
     source: "",
     type: "sale", // 'sale' ou 'rent'
@@ -39,7 +39,10 @@ const AdminMarketPriceForm = () => {
           title: listing.title,
           price: listing.price.toString(),
           description: listing.description,
-          imageUrl: listing.imageUrl,
+          // Compatibilidade com dados antigos (campo imageUrl simples)
+          imageUrls: Array.isArray(listing.imageUrls) 
+            ? listing.imageUrls 
+            : [(listing as any).imageUrl || ""],
           externalLink: listing.externalLink,
           source: listing.source,
           type: listing.type,
@@ -57,15 +60,50 @@ const AdminMarketPriceForm = () => {
     }));
   };
   
+  // Manipulador para URLs de imagens
+  const handleImageUrlChange = (value: string, index: number) => {
+    const newImageUrls = [...formData.imageUrls];
+    newImageUrls[index] = value;
+    setFormData(prev => ({
+      ...prev,
+      imageUrls: newImageUrls
+    }));
+  };
+  
+  // Adicionar nova URL de imagem
+  const addImageUrl = () => {
+    setFormData(prev => ({
+      ...prev,
+      imageUrls: [...prev.imageUrls, ""]
+    }));
+  };
+  
+  // Remover URL de imagem
+  const removeImageUrl = (index: number) => {
+    if (formData.imageUrls.length <= 1) {
+      toast({
+        title: "Aviso",
+        description: "É necessário pelo menos uma imagem.",
+      });
+      return;
+    }
+    
+    const newImageUrls = formData.imageUrls.filter((_, i) => i !== index);
+    setFormData(prev => ({
+      ...prev,
+      imageUrls: newImageUrls
+    }));
+  };
+  
   // Manipulador de envio do formulário
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     // Validação simples
-    if (!formData.title || !formData.price || !formData.imageUrl || !formData.externalLink) {
+    if (!formData.title || !formData.price || formData.imageUrls.some(url => !url) || !formData.externalLink) {
       toast({
         title: "Erro",
-        description: "Por favor, preencha todos os campos obrigatórios.",
+        description: "Por favor, preencha todos os campos obrigatórios, incluindo todas as URLs de imagens.",
         variant: "destructive"
       });
       return;
@@ -199,29 +237,59 @@ const AdminMarketPriceForm = () => {
               </div>
               
               <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="imageUrl">URL da Imagem *</Label>
-                <Input
-                  id="imageUrl"
-                  name="imageUrl"
-                  value={formData.imageUrl}
-                  onChange={handleChange}
-                  placeholder="Ex: https://example.com/image.jpg"
-                  required
-                />
+                <div className="flex items-center justify-between mb-2">
+                  <Label>Imagens (URLs) *</Label>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={addImageUrl}
+                    className="flex items-center"
+                  >
+                    <Plus size={16} className="mr-1" />
+                    Adicionar Imagem
+                  </Button>
+                </div>
+                
+                {formData.imageUrls.map((url, index) => (
+                  <div key={index} className="flex items-start gap-2 mb-3">
+                    <Input
+                      value={url}
+                      onChange={(e) => handleImageUrlChange(e.target.value, index)}
+                      placeholder={`URL da imagem ${index + 1}`}
+                      required
+                    />
+                    <Button 
+                      type="button" 
+                      variant="ghost" 
+                      size="icon"
+                      onClick={() => removeImageUrl(index)}
+                      className="flex-shrink-0 h-10 w-10 text-gray-500 hover:text-red-500"
+                    >
+                      <X size={18} />
+                    </Button>
+                  </div>
+                ))}
               </div>
               
-              {formData.imageUrl && (
+              {formData.imageUrls.length > 0 && formData.imageUrls.some(url => url) && (
                 <div className="md:col-span-2">
-                  <Label>Pré-visualização da Imagem</Label>
-                  <div className="mt-2 border rounded-md overflow-hidden h-48">
-                    <img 
-                      src={formData.imageUrl} 
-                      alt="Pré-visualização" 
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = "https://via.placeholder.com/400x200?text=Imagem+Inválida";
-                      }}
-                    />
+                  <Label>Pré-visualização das Imagens</Label>
+                  <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                    {formData.imageUrls.map((url, index) => (
+                      url && (
+                        <div key={`preview-${index}`} className="border rounded-md overflow-hidden h-48 bg-gray-50">
+                          <img 
+                            src={url} 
+                            alt={`Pré-visualização ${index + 1}`} 
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = "https://via.placeholder.com/400x200?text=Imagem+Inválida";
+                            }}
+                          />
+                        </div>
+                      )
+                    ))}
                   </div>
                 </div>
               )}
