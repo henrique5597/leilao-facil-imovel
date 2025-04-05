@@ -28,8 +28,11 @@ const PropertyDetails = () => {
   
   // Estado para controlar a visualização de imagem atual do imóvel
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  // Tratamos property.imageUrl como um array para futura expansão
-  const propertyImages = property ? [property.imageUrl] : [];
+  
+  // Tratamos property.imageUrl e property.imageUrls para compatibilidade
+  const propertyImages = property 
+    ? ((property as any).imageUrls || (property.imageUrl ? [property.imageUrl] : [])) 
+    : [];
   
   // Funções para navegação de imagens do imóvel principal
   const nextPropertyImage = () => {
@@ -108,7 +111,7 @@ const PropertyDetails = () => {
               {/* Imagem do imóvel */}
               <div className="w-full md:w-1/3 relative">
                 <img 
-                  src={propertyImages[currentImageIndex]} 
+                  src={propertyImages[currentImageIndex] || "https://via.placeholder.com/400x200?text=Sem+Imagem"} 
                   alt={property.title}
                   className="w-full h-full object-cover min-h-[200px]"
                 />
@@ -132,6 +135,13 @@ const PropertyDetails = () => {
                     >
                       <ChevronRight size={18} />
                     </Button>
+                    
+                    {/* Indicador de imagens */}
+                    <div className="absolute bottom-2 left-0 right-0 flex justify-center">
+                      <div className="bg-black/50 rounded-full px-2 py-1 text-xs text-white">
+                        {currentImageIndex + 1}/{propertyImages.length}
+                      </div>
+                    </div>
                   </>
                 )}
                 
@@ -198,6 +208,30 @@ const PropertyDetails = () => {
               </div>
             </div>
           </Card>
+          
+          {/* Galeria de imagens adicionais, se houver mais que 1 imagem */}
+          {propertyImages.length > 1 && (
+            <div className="bg-white p-6 rounded-lg shadow-md">
+              <h2 className="text-xl font-bold mb-4">Galeria de Imagens</h2>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {propertyImages.map((image, index) => (
+                  <div 
+                    key={index} 
+                    className={`cursor-pointer border-2 rounded-md overflow-hidden ${
+                      index === currentImageIndex ? 'border-blue-500' : 'border-transparent'
+                    }`}
+                    onClick={() => setCurrentImageIndex(index)}
+                  >
+                    <img 
+                      src={image} 
+                      alt={`${property.title} - Imagem ${index + 1}`}
+                      className="w-full h-24 object-cover"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
           
           {/* Mapa */}
           <div className="bg-white p-6 rounded-lg shadow-md">

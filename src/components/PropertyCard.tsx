@@ -1,8 +1,10 @@
 
-import { CalendarClock, Heart, Home, MapPin, Square } from "lucide-react";
+import { useState } from "react";
+import { CalendarClock, ChevronLeft, ChevronRight, Heart, Home, MapPin, Square } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 export interface PropertyProps {
   id: string;
@@ -12,7 +14,8 @@ export interface PropertyProps {
   price: number;
   originalPrice?: number;
   discount?: number;
-  imageUrl: string;
+  imageUrl?: string; // Mantido para compatibilidade
+  imageUrls?: string[]; // Novo campo para múltiplas imagens
   auctionDate: string;
   bedrooms?: number;
   area?: number;
@@ -27,10 +30,30 @@ const formatCurrency = (value: number) => {
 };
 
 const PropertyCard = ({ property }: { property: PropertyProps }) => {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  
+  // Compatibilidade com imageUrl/imageUrls
+  const images = property.imageUrls || (property.imageUrl ? [property.imageUrl] : []);
+  const hasMultipleImages = images.length > 1;
+  
   const formattedPrice = formatCurrency(property.price);
   const formattedOriginalPrice = property.originalPrice 
     ? formatCurrency(property.originalPrice) 
     : null;
+  
+  const nextImage = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => (prev + 1) % images.length);
+  };
+  
+  const prevImage = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => 
+      prev === 0 ? images.length - 1 : prev - 1
+    );
+  };
   
   return (
     <Card className="h-full overflow-hidden transition-all hover:shadow-lg">
@@ -41,10 +64,41 @@ const PropertyCard = ({ property }: { property: PropertyProps }) => {
       <div className="flex flex-col sm:flex-row">
         <div className="relative h-48 sm:w-1/3 overflow-hidden">
           <img 
-            src={property.imageUrl} 
+            src={images[currentImageIndex] || "https://via.placeholder.com/400x200?text=Sem+Imagem"} 
             alt={property.title}
             className="w-full h-full object-cover transition-transform hover:scale-105"
           />
+          
+          {/* Navegação de imagens */}
+          {hasMultipleImages && (
+            <>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="absolute left-1 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 text-white hover:bg-black/60"
+                onClick={prevImage}
+              >
+                <ChevronLeft size={18} />
+              </Button>
+              
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 text-white hover:bg-black/60"
+                onClick={nextImage}
+              >
+                <ChevronRight size={18} />
+              </Button>
+              
+              {/* Indicador de imagens */}
+              <div className="absolute bottom-1 left-0 right-0 flex justify-center">
+                <div className="bg-black/50 rounded-full px-2 py-1 text-xs text-white">
+                  {currentImageIndex + 1}/{images.length}
+                </div>
+              </div>
+            </>
+          )}
+          
           {/* Botão de favorito */}
           <button className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center rounded-full bg-white/80 text-gray-700 hover:bg-white">
             <Heart size={18} />

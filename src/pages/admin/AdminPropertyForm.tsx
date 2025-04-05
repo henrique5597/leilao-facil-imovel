@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -25,7 +25,7 @@ const AdminPropertyForm = () => {
     price: "",
     originalPrice: "",
     discount: "",
-    imageUrl: "",
+    imageUrls: [""], // Agora é um array de URLs
     auctionDate: "",
     bedrooms: "",
     area: "",
@@ -36,6 +36,11 @@ const AdminPropertyForm = () => {
     if (isEditing) {
       const property = getPropertyById(id);
       if (property) {
+        // Converter imageUrl para imageUrls se necessário
+        const imageUrls = property.imageUrl 
+          ? [property.imageUrl] 
+          : (property as any).imageUrls || [""];
+          
         setFormData({
           title: property.title,
           address: property.address,
@@ -44,7 +49,7 @@ const AdminPropertyForm = () => {
           price: property.price.toString(),
           originalPrice: property.originalPrice?.toString() || "",
           discount: property.discount?.toString() || "",
-          imageUrl: property.imageUrl,
+          imageUrls: Array.isArray(imageUrls) ? imageUrls : [imageUrls],
           auctionDate: property.auctionDate,
           bedrooms: property.bedrooms?.toString() || "",
           area: property.area?.toString() || "",
@@ -62,12 +67,53 @@ const AdminPropertyForm = () => {
     }));
   };
   
+  // Manipulador para mudanças em URLs de imagem específicas
+  const handleImageUrlChange = (index: number, value: string) => {
+    setFormData(prev => {
+      const newImageUrls = [...prev.imageUrls];
+      newImageUrls[index] = value;
+      return {
+        ...prev,
+        imageUrls: newImageUrls
+      };
+    });
+  };
+  
+  // Adicionar nova URL de imagem
+  const addImageUrl = () => {
+    setFormData(prev => ({
+      ...prev,
+      imageUrls: [...prev.imageUrls, ""]
+    }));
+  };
+  
+  // Remover URL de imagem
+  const removeImageUrl = (index: number) => {
+    if (formData.imageUrls.length <= 1) {
+      toast({
+        title: "Ação não permitida",
+        description: "É necessário ter pelo menos uma imagem.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    setFormData(prev => {
+      const newImageUrls = [...prev.imageUrls];
+      newImageUrls.splice(index, 1);
+      return {
+        ...prev,
+        imageUrls: newImageUrls
+      };
+    });
+  };
+  
   // Manipulador de envio do formulário
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     // Validação simples
-    if (!formData.title || !formData.address || !formData.city || !formData.price || !formData.auctionDate) {
+    if (!formData.title || !formData.address || !formData.city || !formData.price || !formData.auctionDate || !formData.imageUrls[0]) {
       toast({
         title: "Erro",
         description: "Por favor, preencha todos os campos obrigatórios.",
@@ -245,35 +291,73 @@ const AdminPropertyForm = () => {
                   placeholder="Ex: 75"
                 />
               </div>
-              
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="imageUrl">URL da Imagem *</Label>
-                <Input
-                  id="imageUrl"
-                  name="imageUrl"
-                  value={formData.imageUrl}
-                  onChange={handleChange}
-                  placeholder="Ex: https://example.com/image.jpg"
-                  required
-                />
+            </div>
+            
+            {/* Gerenciamento de várias URLs de imagem */}
+            <div className="space-y-2 md:col-span-2">
+              <div className="flex justify-between items-center mb-2">
+                <Label>URLs das Imagens *</Label>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={addImageUrl}
+                  className="flex items-center gap-1"
+                  disabled={formData.imageUrls.length >= 10}
+                >
+                  <Plus size={16} />
+                  Adicionar Imagem
+                </Button>
               </div>
               
-              {formData.imageUrl && (
-                <div className="md:col-span-2">
-                  <Label>Pré-visualização da Imagem</Label>
-                  <div className="mt-2 border rounded-md overflow-hidden h-48">
-                    <img 
-                      src={formData.imageUrl} 
-                      alt="Pré-visualização" 
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = "https://via.placeholder.com/400x200?text=Imagem+Inválida";
-                      }}
-                    />
-                  </div>
+              {formData.imageUrls.map((url, index) => (
+                <div key={index} className="flex gap-2 mb-2">
+                  <Input
+                    value={url}
+                    onChange={(e) => handleImageUrlChange(index, e.target.value)}
+                    placeholder={`URL da imagem ${index + 1}`}
+                    className="flex-grow"
+                    required={index === 0}
+                  />
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    size="icon"
+                    onClick={() => removeImageUrl(index)}
+                    className="text-red-500"
+                  >
+                    <Trash2 size={16} />
+                  </Button>
                 </div>
-              )}
+              ))}
+              
+              <p className="text-sm text-gray-500">
+                Adicione até 10 imagens. Pelo menos uma imagem é obrigatória.
+              </p>
             </div>
+            
+            {/* Preview de imagens */}
+            {formData.imageUrls.some(url => url) && (
+              <div className="md:col-span-2">
+                <Label className="block mb-2">Pré-visualização das Imagens</Label>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                  {formData.imageUrls.map((url, index) => (
+                    url ? (
+                      <div key={index} className="border rounded-md overflow-hidden h-40">
+                        <img 
+                          src={url} 
+                          alt={`Imagem ${index + 1}`} 
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = "https://via.placeholder.com/400x200?text=Imagem+Inválida";
+                          }}
+                        />
+                      </div>
+                    ) : null
+                  ))}
+                </div>
+              </div>
+            )}
             
             <div className="flex justify-end space-x-4 pt-4">
               <Button type="button" variant="outline" onClick={() => navigate("/admin")}>
