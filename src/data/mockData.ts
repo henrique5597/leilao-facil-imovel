@@ -152,7 +152,7 @@ export const mockSaleListings: MarketPriceProps[] = [
     title: "Apartamento 2 quartos no Centro",
     price: 230000,
     description: "Ótimo apartamento com 2 quartos, sala ampla, cozinha planejada e área de serviço.",
-    imageUrl: "https://images.unsplash.com/photo-1619542402915-dcaf30e4e2a1?q=80&w=1000",
+    imageUrls: ["https://images.unsplash.com/photo-1619542402915-dcaf30e4e2a1?q=80&w=1000"],
     externalLink: "https://www.example.com/listing1",
     source: "OLX",
     type: "sale"
@@ -162,7 +162,7 @@ export const mockSaleListings: MarketPriceProps[] = [
     title: "Casa 3 quartos no Jardim Paulista",
     price: 280000,
     description: "Casa com 3 quartos, 1 suíte, sala, cozinha, banheiro, área de serviço e garagem para 2 carros.",
-    imageUrl: "https://images.unsplash.com/photo-1576941089067-2de3c901e126?q=80&w=1000",
+    imageUrls: ["https://images.unsplash.com/photo-1576941089067-2de3c901e126?q=80&w=1000"],
     externalLink: "https://www.example.com/listing2",
     source: "Facebook Marketplace",
     type: "sale"
@@ -172,7 +172,7 @@ export const mockSaleListings: MarketPriceProps[] = [
     title: "Sobrado em condomínio fechado",
     price: 380000,
     description: "Sobrado em condomínio fechado com 3 quartos, 1 suíte, sala ampla, cozinha planejada, área gourmet e 2 vagas de garagem.",
-    imageUrl: "https://images.unsplash.com/photo-1582063289852-62e3ba2747f8?q=80&w=1000",
+    imageUrls: ["https://images.unsplash.com/photo-1582063289852-62e3ba2747f8?q=80&w=1000"],
     externalLink: "https://www.example.com/listing3",
     source: "OLX",
     type: "sale"
@@ -186,7 +186,7 @@ export const mockRentListings: MarketPriceProps[] = [
     title: "Apartamento 2 quartos para alugar no Centro",
     price: 1200,
     description: "Apartamento com 2 quartos, sala, cozinha, banheiro e área de serviço. Prédio com elevador e portaria 24h.",
-    imageUrl: "https://images.unsplash.com/photo-1524758631624-e2822e304c36?q=80&w=1000",
+    imageUrls: ["https://images.unsplash.com/photo-1524758631624-e2822e304c36?q=80&w=1000"],
     externalLink: "https://www.example.com/rental1",
     source: "OLX",
     type: "rent"
@@ -196,7 +196,7 @@ export const mockRentListings: MarketPriceProps[] = [
     title: "Casa 3 quartos para alugar no Jardim América",
     price: 1800,
     description: "Casa com 3 quartos, sala ampla, cozinha, 2 banheiros, área de serviço e garagem para 2 carros.",
-    imageUrl: "https://images.unsplash.com/photo-1558067183-343aa0dcd020?q=80&w=1000",
+    imageUrls: ["https://images.unsplash.com/photo-1558067183-343aa0dcd020?q=80&w=1000"],
     externalLink: "https://www.example.com/rental2",
     source: "Facebook Marketplace",
     type: "rent"
@@ -206,7 +206,7 @@ export const mockRentListings: MarketPriceProps[] = [
     title: "Apartamento 1 quarto mobiliado",
     price: 900,
     description: "Apartamento mobiliado com 1 quarto, sala, cozinha americana e banheiro. Condomínio com piscina e academia.",
-    imageUrl: "https://images.unsplash.com/photo-1585412727339-54e4bae3bbf9?q=80&w=1000",
+    imageUrls: ["https://images.unsplash.com/photo-1585412727339-54e4bae3bbf9?q=80&w=1000"],
     externalLink: "https://www.example.com/rental3",
     source: "OLX",
     type: "rent"
