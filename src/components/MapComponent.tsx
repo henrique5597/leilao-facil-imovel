@@ -1,6 +1,5 @@
-
 import { useEffect, useRef, useState } from 'react';
-import { Compass, Map, Navigation, ZoomIn, ZoomOut } from 'lucide-react';
+import { Compass, ExternalLink, Map, Navigation, ZoomIn, ZoomOut } from 'lucide-react';
 
 interface MapComponentProps {
   latitude: number;
@@ -101,6 +100,9 @@ const MapComponent = ({ latitude, longitude, address }: MapComponentProps) => {
     
     // Add coordinates and address display
     createInfoDisplay(mapContainer);
+    
+    // Add Google Maps link button
+    createGoogleMapsLink(mapContainer);
     
     mapContainer.appendChild(mapContent);
     mapElement.appendChild(mapContainer);
@@ -270,10 +272,18 @@ const MapComponent = ({ latitude, longitude, address }: MapComponentProps) => {
     const addressDisplay = document.createElement('div');
     addressDisplay.className = 'absolute top-3 left-3 right-14 bg-white px-3 py-2 rounded shadow-md text-sm truncate z-20';
     addressDisplay.textContent = address;
+  };
+  
+  // New function to create a Google Maps link button
+  const createGoogleMapsLink = (container: HTMLDivElement) => {
+    const googleMapsBtn = document.createElement('a');
+    googleMapsBtn.className = 'absolute bottom-12 right-3 bg-white rounded-md shadow-md z-20 flex items-center px-3 py-2 text-sm hover:bg-gray-100 text-blue-600';
+    googleMapsBtn.href = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
+    googleMapsBtn.target = '_blank';
+    googleMapsBtn.rel = 'noopener noreferrer';
+    googleMapsBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1"><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line><path d="M21 16v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"></path></svg>Abrir no Google Maps';
     
-    container.appendChild(coords);
-    container.appendChild(zoomDisplay);
-    container.appendChild(addressDisplay);
+    container.appendChild(googleMapsBtn);
   };
   
   const handleZoomIn = () => {
