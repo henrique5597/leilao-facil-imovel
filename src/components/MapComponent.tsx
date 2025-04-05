@@ -12,7 +12,6 @@ const MapComponent = ({ latitude, longitude, address }: MapComponentProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
-    // Implementação aprimorada do mapa usando elementos visuais mais detalhados
     if (mapRef.current) {
       const mapElement = mapRef.current;
       
@@ -40,7 +39,7 @@ const MapComponent = ({ latitude, longitude, address }: MapComponentProps) => {
         }
       }
       
-      // Adiciona linhas horizontais para ruas principais
+      // Adiciona linhas horizontais e verticais para ruas principais
       for (let i = 0; i <= gridSize; i++) {
         const horizontalRoad = document.createElement('div');
         horizontalRoad.className = 'absolute bg-white';
@@ -49,10 +48,7 @@ const MapComponent = ({ latitude, longitude, address }: MapComponentProps) => {
         horizontalRoad.style.width = '100%';
         horizontalRoad.style.height = '2px';
         mapContainer.appendChild(horizontalRoad);
-      }
-      
-      // Adiciona linhas verticais para ruas principais
-      for (let i = 0; i <= gridSize; i++) {
+        
         const verticalRoad = document.createElement('div');
         verticalRoad.className = 'absolute bg-white';
         verticalRoad.style.left = `${(i * 100) / gridSize}%`;
@@ -62,14 +58,23 @@ const MapComponent = ({ latitude, longitude, address }: MapComponentProps) => {
         mapContainer.appendChild(verticalRoad);
       }
       
+      // Adiciona estradas centrais
+      const centralRoadH = document.createElement('div');
+      centralRoadH.className = 'absolute bg-gray-300 left-0 top-1/2 transform -translate-y-1/2 w-full h-[5%]';
+      mapContainer.appendChild(centralRoadH);
+      
+      const centralRoadV = document.createElement('div');
+      centralRoadV.className = 'absolute bg-gray-300 top-0 left-1/2 transform -translate-x-1/2 h-full w-[5%]';
+      mapContainer.appendChild(centralRoadV);
+      
       // Adiciona uma localização do imóvel (pino)
       const pin = document.createElement('div');
-      pin.className = 'absolute w-8 h-8 transform -translate-x-1/2 -translate-y-1/2 flex items-center justify-center';
+      pin.className = 'absolute w-8 h-8 transform -translate-x-1/2 -translate-y-1/2 flex items-center justify-center z-10';
       pin.style.left = '50%';
       pin.style.top = '50%';
       
       const pinInner = document.createElement('div');
-      pinInner.className = 'w-6 h-6 bg-leilao-primary rounded-full relative animate-pulse';
+      pinInner.className = 'w-6 h-6 bg-red-500 rounded-full relative animate-pulse';
       
       const pinDot = document.createElement('div');
       pinDot.className = 'w-2 h-2 bg-white rounded-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2';
@@ -81,15 +86,6 @@ const MapComponent = ({ latitude, longitude, address }: MapComponentProps) => {
       pinInner.appendChild(pinDot);
       pin.appendChild(pinShadow);
       mapContainer.appendChild(pin);
-      
-      // Adiciona alguns elementos de estrada
-      const centralRoadH = document.createElement('div');
-      centralRoadH.className = 'absolute bg-gray-300 left-0 top-1/2 transform -translate-y-1/2 w-full h-[5%]';
-      mapContainer.appendChild(centralRoadH);
-      
-      const centralRoadV = document.createElement('div');
-      centralRoadV.className = 'absolute bg-gray-300 top-0 left-1/2 transform -translate-x-1/2 h-full w-[5%]';
-      mapContainer.appendChild(centralRoadV);
       
       // Adiciona controles de mapa simulados
       const controls = document.createElement('div');
@@ -143,7 +139,7 @@ const MapComponent = ({ latitude, longitude, address }: MapComponentProps) => {
         className="w-full h-full bg-gray-100 flex items-center justify-center"
       >
         <div className="flex flex-col items-center justify-center text-gray-500 p-4">
-          <Map size={32} className="mb-2 text-leilao-primary" />
+          <Map size={32} className="mb-2 text-red-500" />
           <div className="text-center">
             <p>Carregando mapa...</p>
             <p className="text-xs mt-1">Localização: {address}</p>
