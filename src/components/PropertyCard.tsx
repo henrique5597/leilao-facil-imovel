@@ -79,10 +79,14 @@ const PropertyCard = ({ property }: { property: PropertyProps }) => {
           <div className="text-lg font-bold text-leilao-primary">
             {formattedPrice}
           </div>
+          <div className="text-sm text-gray-500">
+            Valor mínimo de venda
+          </div>
           
           {property.originalPrice && (
-            <div className="text-sm text-gray-500 line-through">
-              {formatCurrency(property.originalPrice)}
+            <div className="text-sm text-gray-700 mt-1">
+              <span>{formatCurrency(property.originalPrice)}</span>
+              <span className="text-xs block text-gray-500">Valor de avaliação</span>
             </div>
           )}
         </div>

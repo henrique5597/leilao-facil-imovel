@@ -248,19 +248,21 @@ const PropertyDetails = () => {
         
         {/* Coluna lateral */}
         <div className="space-y-6">
-          {/* Card de preço */}
+          {/* Card de preço - Atualizado para mostrar Valor de avaliação e Valor mínimo de venda */}
           <div className="bg-white p-6 rounded-lg shadow-md sticky top-6">
             <div className="text-center mb-4">
               <h2 className="text-2xl font-bold text-leilao-primary">{formattedPrice}</h2>
+              <p className="text-gray-600 text-sm mt-1">Valor mínimo de venda</p>
               
               {property.originalPrice && (
-                <div className="flex items-center justify-center mt-1">
-                  <span className="text-gray-500 line-through text-sm mr-2">
+                <div className="mt-3">
+                  <span className="text-gray-700 text-lg font-semibold block">
                     {formattedOriginalPrice}
                   </span>
+                  <p className="text-gray-600 text-sm">Valor de avaliação</p>
                   
                   {property.discount && (
-                    <Badge className="bg-leilao-secondary text-white">
+                    <Badge className="bg-leilao-secondary text-white mt-2">
                       {property.discount}% de desconto
                     </Badge>
                   )}
